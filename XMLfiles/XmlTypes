@@ -1,0 +1,303 @@
+	*How do you run the failed test cases in selenium?
+	-Selenium doesn't have this feature but Testng provides this feature that if i only want to run only the failed test cases
+	 there is a option available, it will record all the test failures and it will maintain in an seperate xml file
+	 called Testng-failed.xml.
+	
+	
+	Parallel Execution
+	   -Local System
+	   -Remote Execution
+   
+	 We can assign Threads for:-
+	 
+	1)Test - Cross Browser //(testng.org/documentation-main.html)
+	   
+    Here the test is same but only running in different browsers with help of Parameters.
+   	The moment u have cross browser it is mandatory to use parallel = tests, for this need to 
+   	understand concept of parameters without which we can never achive cross browser.
+   	
+   	TestNG allows you to pass an arbitrary number of parameters to each of your tests using the `@Parameters` annotation.
+	
+	There are three ways to set these parameters:-
+	The testng.xml file
+	Programmatically
+	Java system properties
+	
+	If you are using simple values for your parameters, you can specify them in your testng.xml.
+	DATA PROVIDERS:-
+	Specifying parameters in testng.xml might not be sufficient if you need to pass complex parameters, or parameters that
+	need to be created from Java (complex objects, objects read from a property file or a database, excelfile, csvfile, 
+	jsonfile,xmlfile, javaobjects etc…​).
+	In this case, you can use a Data Provider to supply the values you need to test.A Data Provider is a method on your
+	class that returns an array of array of objects. This method is annotated with @DataProvider.
+	
+	If no parameter named "db" is found in your testng.xml file, your test method will receive the default value specified
+	inside the @Optional annotation: "mysql".
+	
+	@Parameters("db")
+	@Test
+	public void testNonExistentParameter(@Optional("mysql") String db)
+	{
+	    //more code
+	}
+   					  
+   *Parameters using xml will used for cross Browser.
+   *Parameters using Data Providers will used for Data Driven Tests.
+    
+   2)classes - Without Cross browser // classes are not dependent on other class so we can run in 
+   									  parallel.When ever we are declearing a variable at class
+   									  level(global) and we are having a scenario where we have
+   									  to take variable data from previous tests then continue, then paralle ="methods" don't 
+   									  give proper results, then we have to go for parallel="classes".
+   	public class ParallelExecutiion
+	{
+	     String Customer_id;
+	     
+		@Test
+		public void test1()
+		{
+			Customer_id = driver.findElement(By.xpath("")).getText();
+			Reporter.log("test1 executed", true);
+		}
+		@Test()
+		public void test2()
+		{
+			Customer_id.Contains("420");
+			Reporter.log("test2 executed", true);
+		}
+   	}
+   	
+   3)Methods - Without Cross browser // parallel execution of methods is not recommended when methods
+                                      are dependent on each other, in that case go for parallel
+                                      execution of classes, coz classes are not dependent on eachother
+                                      Parallelism helps only when u have Independent tests or modules. 
+   									  Even in dependency on groups u are not allowed to run in parallel.
+   									  In such case run dependent and independent methods seperatly. 
+   									  
+   	*Recommendation vm's are costly, it takes lot of space only for browser execution u don't need vm, u can do same 								  
+	 thing with the help of container, container hardly takes 150mb to 200mb they are very fast, light weight u 
+	 just need the browser to execute.
+	 
+	*if 10 methods on a priority of 1 to 10 are run in parallel execution then here the threads will not
+	wait , will run but will get inconsistency results and they wil be a conflict, in official documentation
+	these points are mentioned that when ever u have priorities, "dependency on method" and "dependencies
+	on groups" its not recommended to run in parallel, coz u purposefully created these dependencies. In this
+	case u can go with parallel = classes.
+
+
+
+
+	<suite  name="Suite">      //For Cross browser Testing
+	
+	  <test name="Test1">
+	    <classes>
+	      <class name="testNgDemo.TestNGAnnotationDemo1"/>
+	    </classes>
+	  </test>
+	   
+	  <test name="Test2">
+	    <classes>
+	      <class name="testNgDemo.TestNGAnnotationDemo2"/>
+	    </classes>
+	  </test> 
+	  
+	   <test name="Test3">
+	    <classes>
+	      <class name="testNgDemo.TestNGAnnotationDemo3"/>
+	    </classes>
+	  </test>
+	  
+	  <test name="Test4">
+	    <classes>
+	      <class name="testNgDemo.TestNGAnnotationDemo4"/>
+	    </classes>
+	  </test>
+	  
+	</suite>
+	
+!---!---*@---*@---*@---*@---*@---*@---*@---*@---*@---*@---*@---*@---*@---*
+	
+	<suite name="Suite">
+	
+	  <test name="Test">
+	    <classes>
+	      <class name="testNgDemo.TestNgXML1"/>
+	      <class name="testNgDemo.TestNgDemo1"/>
+	      <class name="testNgDemo.TestNgDemo2"/>
+	      <class name="testNgDemo.TestNgDemo3"/>
+	      <class name="testNgDemo.TestNgDemo4"/>
+	      <class name="testNgDemo.TestNgDemo5"/>
+	    </classes>
+	  </test>
+	  
+	</suite>
+
+!---!---*@---*@---*@---*@---*@---*@---*@---*@---*@---*@---*@---*@---*@---*
+
+*Priority of Annotations in orderBasis.
+
+@BeforeSuite
+	@BeforeTest
+		@BeforeClass
+			@BeforeGroup
+				@BeforeMethod
+					@Test
+					@Test
+				@AfterMethod
+			@AfterGroup	
+		@AfterClass
+	@AfterTest
+@AfterSuite				
+
+
+Q)Difference b/w DataProvider and DataProviderclass?
+A)they both r helping us to perform datadriventest,DataProviderclass is only needed when r maintaining all the data provider
+  in a seperate class.
+  
+Q)why maintaiping two files excel and properties,why not put all data in excel file?
+Best practise is to shouldn't mix everything, testdata is something different for different cases.
+ Cofiguration is specific to project, i don't need to change very often, but testdata might change
+ for different test cases.
+ 
+ 
+ *PageObject model is a design pattern(certain rules and best practises) that help u to write ur automated test in a clean manner
+  which enhance test maintainence and reduce the code duplication.
+  -A page object is an object oriented class that serves as an interface to a page of your AUT.
+  -This can be done in two ways:-
+   1)Standard page object model without using pre-defined class.
+   2)With pre-defined class avaliable in selenium called page factory, it is specially designed
+    in selenium to support page object model,it is fine even if u don't use it.
+  -Page objects themselves should never make verification or assertions.This is part of your test
+   and should always be within the test's code, never in an page object.The page object will contain
+   the representation of the page and the services the page provides via methods but no code related
+   to what is being tested should be within the page object.
+   
+Q)Difference b/w @FindBy, @FindBys, @FindAll.
+
+*A frameWork is a set of rules, concepts and practices that needs to be followed.
+ --Something similar to the syntax of a programming language.Syntax sets the rules. In a testing framework it could be the
+ standard with which a test class needs to be designed or a standard which should always be followed to perform test logging.
+ --see slides.
+ 
+ Myths In the Market:-
+ 1)Creating frame from the scratch or use Exitising FrameWork, existing framework means they are set of people who r talanted
+  they long time from the industry, they have created the repository or project, in java its a pure github repository which
+  they can expose as a Jar file we can use directly.
+  
+ --Popular frameWorks available in the market:
+  1)Serenity BDD
+  2)karate
+  3)selenide
+  4)Halenium
+  5)katalium
+  6)easyrepro
+  7)Katalon
+  8)TestProject
+   .etc
+ -Here in these frameworks they is no full control,minor changes we can make but can't change the whole skeleton or customize it.
+  like Once u buy a house and u can't break the walls and customize it.
+  
+  Q)Are u comfortable that if u have to build everything from scratch, have u created any framework,how comfortable u r 
+    while creating a framework or making the changes in the existing framework.
+  A)ur ans should be yes.u should never say that yeah i all ready had a framework i was just contributing little bit, i was
+    making some changes.Nobody wants u are not capable of building a framework.Always say i know how to design a framework,
+    also i have designed a framework.
+    
+  Q)Do we need a single framework for Web,API, Mobile..etc?
+  A)yes, but they is no hard and fast rule.For Web we are using Selenium, for API we are using RestAssure, for Mobile we r
+  Using APPium. so if u notice few things are standard,Reports will not change,utilites will not change,few things will change
+  that how u invoke the test in Web & in Mobile, but api is a different set of libraries we need, so they is no fix rule.
+  Karate framework it self supports Web,API,Mobile & Desktop ,her u don't need to maintain multiple frameworks, karate is the
+  best example.
+  				yes one framework can have all, but if u want to build dedicated framework u can do but obviously u have to
+  maintain 3 projects i.e..3 frameworks.But Serenity,Selenide,Halenium,Katalium uses plain Selenium Framework.
+  
+  Large Org.
+  Q)In my company i have a dedicated team who builds the framework, and other teams maintain.If there is a large organization
+   they seriously wants to take the benifits of automation,they have team generally they call these as CAT team or Automation
+   Team(AT) or Central Development team(CDT) ,they only focus on the Framework development,enhances and maintainance.The main
+   Purpose the team is develop the framework,enhancement and maintainace.
+   																		  They will build the framework,and provide a Library
+   or Jar file or a dependency, once u get the dependency all the team members or all the different teams they can start using
+   this framework.Let framework name is Selenium Test Automation FrameWork(STAF1.1) or any name.If any team needs facing 
+   any issue, or needs any module they can ask this CADT/COE/AT/CAT team.
+  
+  Small/Medium Org.
+  If u have a small or medium scale or if u are just starting with automation u might not need a dedicated team, so in the same 
+  team few resources will be working on the automation,few resources will be working on the manual testing and few resourcs
+  will be doing both.
+  					  So this framework we are creating this can be use by all team members so is it possible that we can
+  expose this to the outer world something call public framework so that everybody can use.They is something call Public 
+  repositories & Private repositories. public repos can be exposed to public,private repos are designed for specific client
+  or company that can't be shared.
+  
+  Q)Who decides which framework to follow, which design pattern to follow & what other best practices?
+  A)5+, 7+ experienc people
+  
+  Q)how much time it takes to build a minium framework?
+  A)its a never ending process.For building basic skeleton using maven and execute using jenkins it needs 3/5hrs, but once
+  the skeleton is ready u have to keep on adding the libraries.
+  
+  Q)Should we go with the paid verison or free version?
+  A)For paid versions u have a upper hand,u will get a support so that u can ask a question that this feature is not working
+  i need the fix by evening or by nxt week.Lets say tomarrow u get a requirement that u need to build a system where u need
+  to show the Test Status from last one year,for paid version u will get a paid tools which maintains the logs history, but
+  for the free tools u have to come up with the ideas. 
+  											For free verisions u are taking the open source library u are building everything
+  from the scratch so u r the one who fix it. $1000 per month/per user, so here comes the management involvment, u have to set
+  with the manager, this is the cost & involved u have to show & this is the return on investment(ROI) which we can get.If
+  u don't show the ROI no body will pay u for the tool cost.
+  
+  Q)DO we need to learn any frameWork in current market.?
+  A)U joined a team there r using this framework in that case u can learn.But just for the job change not required,if u r 
+  still interested go with serenity.
+  
+  
+  What is Build?(build tools maven, gradle)
+  A)Set of tasks like Compile, create a executable file,jar file,deploy, execute test, delete directory,each task will perform
+  certain activity these tasks when u combine as a set of task is called build.it can be a custom task or predefined task.
+  Build for devlopers is like code compilation,unit test,create package, deploy.Until all the tasks are not completed the
+  build will not come under success.
+  													In automation case we use these build tools to trigger our automated test
+  In our case when i say execute my test build it means i want to run my all xml files, and even a single test failed my build\
+  will fail.Maven says how do i know which xml/how many xmls to trigger,we tell it by maven surefire plugin in POM.
+  
+  Q)which command & plugin use in maven to execute ur test?how do u create a build in maven.?
+  A)MVN test, maven surefire plugin.We create a build by adding a build tag and a surefire plugin.we run this build via ecplise
+  ,via command line interface(CLI),in real time we need cli to run in any location.mvn -version,mvn install,mvn test,change
+  ur directory to ur project directory by cd users/....when i say mvn test, it checks for dependecies in cache if there r not
+  it will download all dependencies,then it will compile & it will run all the tests & i will either get build success or
+  fail. To run build in any ci server we need only one command Mvn test.
+  																		To build an application we have diff(assembly plugin)
+  plugin,to complie we have different plugin,for testing we have maven surefireplugin,to create failsagfe report we have
+  failsafe plugin,so one pom.xml have multiple plugin,each plugin is responsible for one goal.Developers have seperate
+  project and tester have seperate project,we don't club our code with dev environment for the dev project, coz any small
+  change in the plugin can disrupt the complete build,its always good pratice to keep project for automated test.
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+   
